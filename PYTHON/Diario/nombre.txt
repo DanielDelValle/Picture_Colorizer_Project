@@ -1,0 +1,12 @@
+A string to write 
+otra l�nea
+línea máxima
+Prueba numerada 0
+Prueba numerada 1
+Prueba numerada 2
+A string to write 
+otra l�nea
+línea máxima
+Prueba numerada 0
+Prueba numerada 1
+Prueba numerada 2
