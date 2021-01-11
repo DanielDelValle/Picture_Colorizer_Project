@@ -1,4 +1,5 @@
 import pandas as pd
+
 def counlist():
     
     suicide = pd.read_csv("C:\\DATA_SCIENCE\\PROYECTO\\documentation\\who_suicide_statistics.csv")
