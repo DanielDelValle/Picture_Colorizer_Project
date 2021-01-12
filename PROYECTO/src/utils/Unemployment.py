@@ -5,13 +5,14 @@ import plotly.express as px
 import plotly.graph_objs as go
 import psutil
 import plotly.io as pio
-from utils.mining_data_tb import countrylist
+from mining_data_tb import *
 
 unemployment = pd.read_csv("C:\\DATA_SCIENCE\\PROYECTO\\documentation\\unemployment_all_ratio.csv")
 
 unemp = unemployment.loc[unemployment['Series'] == "Unemployment rate"]                          #selecting only values of interest(unemployment rate only)
 
-unemp = unemp.loc[unemp["Country"].isin(countrylist)]                                            #selecting values only for countries in both dataframes
+unemp = unemployment.loc[unemployment["Country"].isin(countrylist)]                              #selecting values only for countries in both dataframes
+                                                       
 
 unemp = unemp[~unemp.Country.str.contains("Euro", na=False)]                                     #discarding groups of countries(no info in the other dataframe)
 unemp = unemp[~unemp.Country.str.contains("OECD", na=False)]  
@@ -32,6 +33,9 @@ unemp['age'] = unemp['age'].str.replace(' to ', '-')                            
 unemp = unemp[(unemp['age'] == '15-24') | (unemp['age'] == '25-34') |(unemp['age'] == '35-44') |(unemp['age'] == '45-54') | (unemp['age'] == '55-64') |(unemp['age'] == '65-69') | (unemp['age'] == '70-74')]
 unemp.loc[(unemp["age"] == '35-44') | (unemp["age"] == '45-54'), 'age'] = '35-54'
 unemp.loc[(unemp["age"] == '55-64') | (unemp["age"] == '65-69') | (unemp["age"] == '70-74'), 'age'] = "55-74"
+
+
+
 
 
 aggregation_functions = {'unemploy_rate': 'mean'}

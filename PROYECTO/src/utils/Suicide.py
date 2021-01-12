@@ -5,7 +5,7 @@ import plotly.express as px
 import plotly.graph_objs as go
 import psutil
 import plotly.io as pio
-from utils.mining_data_tb import countrylist
+from mining_data_tb import countrylist
 
 suicide = pd.read_csv("C:\\DATA_SCIENCE\\PROYECTO\\documentation\\who_suicide_statistics.csv")
 
@@ -18,6 +18,9 @@ suic = suic[suic['year'] >= 2000]
 suic['age'] = suic['age'].str.rstrip('years ')                                  
 
 suic["suic_100k"] = ((suic.suicides_no/suic.population)*100000).round(2)
+
+
+
 
 aggregation_functions = {'suic_100k': 'mean'}
 
