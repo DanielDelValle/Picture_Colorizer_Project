@@ -146,11 +146,17 @@ def corrFilter(x: pd.DataFrame, bound: float):
 
 def corr_comparer(df, col):
     """Returns the correlations of a column respect the rest of df columns"""
-    return df[df.columns[1:]].corr()[col][:].sort_values()
+    return df[df.columns[:]].corr()[col][:].sort_values()
 
 
 def outlier_out(df, col)
 """Remove possible outliers (i.e, top and bottom 2.5 percentiles)"""
 
-df = df[(df[col] > df[col].quantile(0.025)) & (df[col] < df[col].quantile(0.975))
-]
+df = df[(df[col] > df[col].quantile(0.025)) & (df[col] < df[col].quantile(0.975))]
+
+
+df_mean, df_std = df.mean(), df.std()
+# identify outliers
+cut_off = df_std * 3
+lower, upper = df_mean - cut_off, df_mean + cut_off
+outliers = [x for x in df if x < lower or x > upper]    # se supone que detecta outlayers
