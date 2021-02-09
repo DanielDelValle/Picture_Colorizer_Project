@@ -1,4 +1,8 @@
     
+import pandas as pd
+import numpy as np
+
+
 def date_fixer(x):
 
     """   fixes the usual error on dates   """
@@ -10,7 +14,7 @@ def date_fixer(x):
         year = x.year
     return datetime.date(year,x.month,x.day)
 
-def csv_reader(df):
+def csv_info(df):
     """reads and gives main info about a csv file"""
     import pandas as pd
     import numpy as np
@@ -20,7 +24,7 @@ def csv_reader(df):
 
 def list_dif(a, b):
 
-""" This function returns the items in a(list) that are not present in b(list)"""
+    """ This function returns the items in a(list) that are not present in b(list)"""
     for x in a:
         if x in a and x in b:
             a.remove(x)
@@ -33,7 +37,7 @@ def list_dif(a, b):
 
 def column_lower(df):
 
-       """ Lowers all strings in columns of a dataframe """
+    """ Lowers all strings in columns of a dataframe """
 
     df.columns = [x.lower() for x in df.columns]
     return df     
@@ -149,14 +153,33 @@ def corr_comparer(df, col):
     return df[df.columns[:]].corr()[col][:].sort_values()
 
 
-def outlier_out(df, col)
-"""Remove possible outliers (i.e, top and bottom 2.5 percentiles)"""
 
-df = df[(df[col] > df[col].quantile(0.025)) & (df[col] < df[col].quantile(0.975))]
+def outlayers_df(df):
+    """Removes outlayers in whole df given quantiles"""
+    Q1=df.quantile(0.05)
+    Q3=df.quantile(0.95)
+    IQR=Q3-Q1
+    lowqe_bound=Q1 - 1.5 * IQR
+    upper_bound=Q3 + 1.5 * IQR
+    df = df[~((df < lowqe_bound) | (df > upper_bound)).any(axis=1)]
+    print(lowqe_bound,upper_bound)
+
+def outlayers_col(df, outlay_ratio, col):
+    """Removes outlayers on ratio, on specified column"""
+    df = df[(np.abs(stats.zscore(df[col])) < ratio)]
 
 
-df_mean, df_std = df.mean(), df.std()
-# identify outliers
-cut_off = df_std * 3
-lower, upper = df_mean - cut_off, df_mean + cut_off
-outliers = [x for x in df if x < lower or x > upper]    # se supone que detecta outlayers
+def nan_replacer(df, col, operator):
+    """Replaces NaN values in specific column by a given val(mean, median, 0...)"""
+    if isinstance (val, [int, float]):
+        df[col] = df[col].fillna(operator)
+    else:
+        df[col] = df[col].fillna(df[col].operator())
+
+def nan_out_cols(df, ratio):
+    """Given a nan ratio (0.9, f.example), drops all columns with it."""
+    df=df.dropna(axis=1,thresh=len(df)*ratio)
+
+def nan_out_rows(df, hows):
+    """Given a nan ratio (0.9, f.example), drops all rows with it."""
+    df=df.dropna(axis=0,how=hows)

@@ -26,3 +26,18 @@ def facto(n):
         return f"Factorial of {n} is : {factorial}"
 
     facto(5)
+
+
+    def descending_order(num):
+        """ From a non-negative integer, it reorders digits and forms highest posibble. DEVELOPED FOR A CODEWARS KATA"""
+        numblist = []
+        num = str(num)
+        for x in num:
+            numblist.append(x)
+            numblist.sort()
+            numblist = numblist[::-1]
+        for y in numblist:
+            y = str(y)
+            numblist = ''.join(numblist)     
+        return int(numblist)
+            
