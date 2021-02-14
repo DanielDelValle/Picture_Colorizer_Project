@@ -10,5 +10,6 @@ def read_json(fullpath):
 
 
 def barr_add(path):
-    path.replace("\\", r"\\")
-    return path
+    for x in path:
+        path.replace("\\", r"\\")
+    print('path:', path)

@@ -1,6 +1,30 @@
-    
-import pandas as pd
+import sys
+import pickle
 import numpy as np
+import pandas as pd
+import seaborn as sns
+from scipy import stats
+from sklearn import datasets
+from xgboost import XGBRegressor
+import matplotlib.pyplot as plt
+sys.path.append('C:\\DATA_SCIENCE')
+from sklearn import linear_model
+from sklearn.impute import SimpleImputer
+from sklearn.compose import ColumnTransformer
+from sklearn.tree import DecisionTreeRegressor
+from sklearn.ensemble import RandomForestRegressor, RandomForestClassifier
+from sklearn.linear_model import LinearRegression
+from sklearn.compose import make_column_transformer
+from sklearn.pipeline import make_pipeline, Pipeline
+from sklearn.model_selection import train_test_split, StratifiedKFold, RepeatedKFold, RepeatedStratifiedKFold, KFold, cross_val_score, GridSearchCV
+from sklearn.metrics import accuracy_score, r2_score, mean_squared_error, accuracy_score
+from sklearn.preprocessing import LabelEncoder, StandardScaler, OneHotEncoder, RobustScaler, Normalizer, PolynomialFeatures, MinMaxScaler
+from LIBRARY.Libreria_Folders_DVG import *
+from LIBRARY.Libreria_ML_DVG import *
+from LIBRARY.Libreria_Maths_DVG import *
+from LIBRARY.Libreria_Graphs_DVG import *
+
+
 
 
 def date_fixer(x):
@@ -22,7 +46,7 @@ def csv_info(df):
     print(x.dtypes, "\n\n", "Rows, Columns: ", x.shape,"\n\n", x.columns, "\n\n", x.head())
 
 
-def list_dif(a, b):
+def list_difference(a, b):
 
     """ This function returns the items in a(list) that are not present in b(list)"""
     for x in a:
@@ -84,6 +108,9 @@ def column_renamer(df, old, new):
     df = df.rename(columns = changer)
     return df
 
+def col_dropper(df, undesired):
+    df.drop(columns=undesired, inplace=True)
+
 def value_renamer(df, col1, old, new):
     """Renames values on column, given their current name and the new name.
     Both in string"""
@@ -139,7 +166,7 @@ def most_least(df, col, val, quant):
 
 
 
-def corrFilter(x: pd.DataFrame, bound: float):
+def corrFilter(x: pd.DataFrame, bound):
     """Finds most correlated columns in a df, below corr. factr (bound) and discarding duplicates"""
     
     xCorr = x.corr()
@@ -150,36 +177,77 @@ def corrFilter(x: pd.DataFrame, bound: float):
 
 def corr_comparer(df, col):
     """Returns the correlations of a column respect the rest of df columns"""
-    return df[df.columns[:]].corr()[col][:].sort_values()
+    return df[df.columns[:]].corr()[col][:].sort_values(ascending=False)
 
 
 
-def outlayers_df(df):
-    """Removes outlayers in whole df given quantiles"""
-    Q1=df.quantile(0.05)
-    Q3=df.quantile(0.95)
-    IQR=Q3-Q1
-    lowqe_bound=Q1 - 1.5 * IQR
-    upper_bound=Q3 + 1.5 * IQR
-    df = df[~((df < lowqe_bound) | (df > upper_bound)).any(axis=1)]
-    print(lowqe_bound,upper_bound)
+def outliers_df(df, deviation):
+    """Removes outlayers"""
 
-def outlayers_col(df, outlay_ratio, col):
-    """Removes outlayers on ratio, on specified column"""
-    df = df[(np.abs(stats.zscore(df[col])) < ratio)]
+    num_cols = ['int16', 'int32', 'int64', 'float16', 'float32', 'float64']
+    df_num = df.select_dtypes(include=num_cols)
+
+    for col in df_num:
+        df_mean, df_std = df[col].mean(), df[col].std()
+        cut_off = df_std * deviation    
+        lower, upper = df_mean - cut_off, df_mean + cut_off
+        outliers = [x for x in col if (x < lower) or (x > upper)]
+        outliers_removed = [x for x in col if (x > lower) and (x < upper)]
+        print('Identified outliers: %d' % len(outliers))
+        print('Non-outlier observations: %d' % len(outliers_removed))
+
+    return df
+
+def nan_out_cols(df):
+    """Given a df drops all columns with 0.9 nan ratio on them."""
+    df.dropna(axis=1,thresh=len(df)*0.9)
+
+def nan_out_rows(df):
+    """Given a df drops all columns with all nan on them."""
+    df.dropna(axis=0)
 
 
-def nan_replacer(df, col, operator):
-    """Replaces NaN values in specific column by a given val(mean, median, 0...)"""
-    if isinstance (val, [int, float]):
-        df[col] = df[col].fillna(operator)
-    else:
-        df[col] = df[col].fillna(df[col].operator())
+def clean_df(path):    
+    for x in path:
+        path.replace("\\", r"\\") 
+        if path[-3:] == 'csv':
+            df= pd.read_csv(path)
+        elif path[-4:] == 'xlsx':
+            df = pd.read_excel(path)
+        elif path[-4:] == 'json':            
+            with open(path, "r") as json_file_readed:
+                df = pd.DataFrame(json.load(json_file_readed))
+        else: 
+            print('Please use csv / json / xlsx files only')
+    outliers_df
+    nan_out_cols(df)
+    nan_out_rows(df)
+    return df   
 
-def nan_out_cols(df, ratio):
-    """Given a nan ratio (0.9, f.example), drops all columns with it."""
-    df=df.dropna(axis=1,thresh=len(df)*ratio)
 
-def nan_out_rows(df, hows):
-    """Given a nan ratio (0.9, f.example), drops all rows with it."""
-    df=df.dropna(axis=0,how=hows)
+def type_changer(df, origin, desired):
+    lista = df.select_dtypes(origin).columns
+    for x in lista:
+        if desired == 'numeric':
+            df[x] = df[x].apply(pd.to_numeric)
+        elif desired == 'object':
+            df[x] = df[x].apply(pd.to_str)
+        elif desired == 'datetime':
+            df[x] = df[x].apply(pd.to_datetime)
+    return df.dtypes
+
+def nan_ratio(df):
+    na_ratio = ((df.isnull().sum() / len(df))*100).sort_values(ascending = False)
+    return na_ratio
+
+
+def outlier_quant(df, quantile_low, quantile_high):
+    num_cols = ['int16', 'int32', 'int64', 'float16', 'float32', 'float64']
+    df_num = df.select_dtypes(include=num_cols)
+    for col in df_num:
+        q_low = df[col].quantile(quantile_low)
+        q_hi  = df[col].quantile(quantile_high)
+
+    df_filtered = df[(df[col] < q_hi) & (df[col] > q_low)]
+    
+    return df_filtered

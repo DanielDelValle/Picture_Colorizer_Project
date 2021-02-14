@@ -1,3 +1,7 @@
+import pymysql
+import pymysql.cursors
+import pandas as pd
+
 def sqlite_to_csv(file_path, table_name, output_file):
     """ Creates a csv file from sqlite file
 
@@ -20,3 +24,19 @@ def sqlite_to_csv(file_path, table_name, output_file):
         database.to_csv(output_file, index=False)
     except:
         print("ERROR: CSV file not created.")
+
+
+def table_show():
+    """Shows al table names from a database"""
+    conn = connector()
+    cursor = conn.cursor()
+    cursor.execute("SHOW TABLES") 
+    return cursor.fetchall()
+
+def table_extractor(table):
+    """Extracts a table from database to convert into DataFrame"""       
+    query = f"""SELECT * FROM {table}"""
+    conn = connector()
+    return pd.read_sql_query(query, conn)
+    
+    

@@ -1,5 +1,3 @@
-import datetime
-import plotly
 import pandas as pd
 import numpy as np
 import seaborn as sns
@@ -22,11 +20,12 @@ def plotlier(df):
     for i in df.columns:
 
         fig = go.Figure()
-        fig.add_trace(go.Bar(x=c19df.index, y=c19df[i], name=i))
+        fig.add_trace(go.Bar(x=df.index, y=df[i], name=i))
         fig.update_layout(legend=dict(x=0,y=1), xaxis=dict(tickmode='linear', tick0=0, dtick=0), width=1500, height=800)
         fig.update_layout(title=i, font=dict(family="Arial", size=17))
         #fig.write_html(f"..\\reports\\html\\{i}.html")
         #fig.write_image(f"..\\reports\\png\\{i}.png", width=1280, height=960)
+      
 
 
 
@@ -68,7 +67,8 @@ def lplotly_pCountry(data,columns):
 
 #correlation heatplot
 def corr_hplot(data,columns):
-    sns.heatmap(data[data.location=="Spain"][columns].corr())
+    """Plots correlation heatmap against some columns"""
+    sns.heatmap(data[columns].corr())
     plt.title("Correlation Heat Plot")
     plt.show()
 
@@ -85,4 +85,5 @@ def corr_visual(df):
     """Creates a good correlation matrix for a given df"""
     corrmat = df.corr()
     f,ax = plt.subplots(figsize=(10,9))
-    sns.heatmap(round(corrmat,3),ax=ax,cmap='YlOrBr',linewidths = 0.1,annot=True)
+    q = sns.heatmap(round(corrmat,3),ax=ax,cmap='YlOrBr',linewidths = 0.1,annot=True)
+    return q
