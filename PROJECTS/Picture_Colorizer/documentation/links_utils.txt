@@ -1,0 +1,9 @@
+https://emilwallner.medium.com/colorize-b-w-photos-with-a-100-line-neural-network-53d9b4449f8d
+
+https://iq.opengenus.org/convert-colored-images-to-grayscale-autoencoder/
+
+
+https://stackoverflow.com/questions/35836326/convert-rgba-image-to-black-and-white-image-in-tensorflow
+
+
+https://better-coding.com/solved-attributeerror-module-tensorflow-has-no-attribute-placeholder/
