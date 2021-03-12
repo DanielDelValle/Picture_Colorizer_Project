@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload_image</title>
+</head>
+
+<body>
+    <p>
+        You are transforming <h3>{{format}} </h3> pictures.
+
+        Please, proceed now to upload your image(s)
+    </p>
+
+    
+   <body>
+      <form action = "http://localhost:7091/upload_image" method = "POST" 
+         enctype = "multipart/form-data">
+         <input type = "file" name = "image" multiple/>
+         <input type = "submit"/>
+      </form>
+   </body>
+
+    
+</body>
+
+</html>
